@@ -5,51 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blackdev Retro Hub</title>
 <style>
-body {
-    margin:0; background:#0a0a0a; font-family:"Courier New", monospace; color:#e2e2e2;
-}
-/* CRT / retro effect */
-.scanline{position:fixed; inset:0; background:repeating-linear-gradient(to bottom,rgba(255,255,255,0.03)0px,rgba(255,255,255,0.03)1px,transparent 2px);pointer-events:none; z-index:999;}
-.title{width:100%; text-align:center; padding:20px 0; font-size:40px; letter-spacing:10px; font-weight:bold; filter:blur(0.4px); color:#c0c0ff; text-shadow:0 0 6px #4a4aff;}
-.layout{display:grid; grid-template-columns:240px 1fr; height:calc(100vh - 120px);}
-.sidebar{border-right:2px solid #333; padding:15px; overflow-y:auto;}
+body { margin:0; background:#0a0a0a; font-family:"Courier New", monospace; color:#e2e2e2; }
+.scanline {position:fixed; inset:0; background:repeating-linear-gradient(to bottom,rgba(255,255,255,0.03)0px,rgba(255,255,255,0.03)1px,transparent 2px);pointer-events:none; z-index:999;}
+.title {width:100%; text-align:center; padding:20px 0; font-size:40px; letter-spacing:10px; font-weight:bold; filter:blur(0.4px); color:#c0c0ff; text-shadow:0 0 6px #4a4aff;}
+.layout {display:grid; grid-template-columns:240px 1fr; height:calc(100vh - 120px);}
+.sidebar {border-right:2px solid #333; padding:15px; overflow-y:auto;}
 .sidebar h2{margin-top:0; font-size:18px;}
 .sidebar a{color:#9ac0ff; text-decoration:none; display:block; margin-bottom:5px; cursor:pointer;}
 .sidebar input,.sidebar button{margin-top:5px;}
-.main{display:grid; grid-template-rows:1fr 1fr; padding:15px;}
-.section{border-bottom:2px solid #333; padding:20px;}
+.main {display:grid; grid-template-rows:1fr 1fr; padding:15px;}
+.section {border-bottom:2px solid #333; padding:20px;}
 .section:last-child{border-bottom:none;}
 .section h2{margin-top:0; font-size:20px; color:#9ac0ff;}
 .placeholder-box{width:100%; height:100%; border:2px dashed #444; border-radius:6px; opacity:0.7; padding:5px;}
-/* Profile pic & menu */
 .profile-container{position:fixed; top:10px; left:10px; z-index:1000;}
-.profile-pic{width:50px;height:50px;border-radius:50%;cursor:pointer;border:2px solid #4a4aff;}
+.profile-pic{width:50px;height:50px;border-radius:50%;cursor:pointer;border:2px solid #4a4aff; text-align:center; line-height:50px;}
 .popup-menu{display:none;position:absolute;top:60px;left:0;background:#111;border:1px solid #444;padding:10px;border-radius:6px;}
 .popup-menu button{display:block;width:100%;margin-bottom:5px;color:#eee;background:#222;border:none;cursor:pointer;padding:5px;}
 .popup-menu button:hover{background:#333;}
-/* Subcategory page overlay */
-#subcatPage{display:none;padding:20px;background:#111;position:fixed;top:0;left:0;width:100%;height:100%;color:#eee;z-index:2000;overflow:auto;}
-#subcatPage button{background:#222;border:none;padding:5px;color:#eee;cursor:pointer;margin-bottom:10px;}
-#subcatPage button:hover{background:#333;}
-/* Settings / Search overlay */
-#settingsOverlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#111;color:#eee;z-index:2000;overflow:auto;padding:20px;}
-#settingsOverlay h2{margin-top:10px;}
-#settingsOverlay button,input,select{margin:5px 0; padding:5px; background:#222; color:#eee; border:none;}
-#settingsOverlay button:hover{background:#333;}
+#subcatPage, #makePostOverlay, #settingsOverlay{display:none;padding:20px;background:#111;position:fixed;top:0;left:0;width:100%;height:100%;color:#eee;z-index:2000;overflow:auto;}
+#subcatPage button, #makePostOverlay button, #settingsOverlay button{background:#222;border:none;padding:5px;color:#eee;cursor:pointer;margin-bottom:10px;}
+#subcatPage button:hover, #makePostOverlay button:hover, #settingsOverlay button:hover{background:#333;}
+.post, .comment{border:1px solid #444; border-radius:6px; padding:5px; margin-bottom:10px;}
+.comment{margin-left:20px; border-color:#555;}
+img.post-image{max-width:100px; margin-right:5px;}
 </style>
 </head>
 <body>
+
 <div class="scanline"></div>
 <div class="title">blackdev</div>
 
 <!-- Profile menu -->
 <div class="profile-container">
-    <img src="profile.png" class="profile-pic" id="profilePic">
+    <div class="profile-pic" id="profilePic">U</div>
     <div class="popup-menu" id="popupMenu">
         <button id="signInBtn">Sign In / Sign Up</button>
         <button id="changeUserBtn">Change Username</button>
         <button id="logoutBtn">Log Out</button>
-        <button id="settingsBtn">Settings / Search</button>
+        <button id="settingsBtn">Settings</button>
     </div>
 </div>
 
@@ -61,7 +55,6 @@ body {
         <input type="text" placeholder="New subcategory" id="newSubcat">
         <button id="addSubcatBtn">Add</button>
     </div>
-
     <div class="main">
         <div class="section">
             <h2>Popular Categories</h2>
@@ -79,43 +72,67 @@ body {
 <div id="subcatPage">
     <button id="closeSubcat">← Back</button>
     <h2 id="subcatTitle"></h2>
+    <div id="subcatBanner"></div>
+    <div id="subcatRules"></div>
+    <button id="makePostBtn">Make Post</button>
     <div id="subcatContent"></div>
 </div>
 
-<!-- Settings / Search overlay -->
+<!-- Make Post overlay -->
+<div id="makePostOverlay">
+    <button id="closeMakePost">← Back</button>
+    <h2>New Post in <span id="postSubcatName"></span></h2>
+    <input type="text" placeholder="Title" id="postTitle"><br>
+    <textarea placeholder="Content" id="postContent" rows="4" style="width:100%"></textarea><br>
+    <input type="text" placeholder="Flair (*example)" id="postFlair"><br>
+    <input type="text" placeholder="Tags (#example)" id="postTags"><br>
+    <input type="file" id="postImage" multiple><br>
+    <button id="submitPost">Submit Post</button>
+</div>
+
+<!-- Settings overlay -->
 <div id="settingsOverlay">
-    <h2>Settings / Top Results</h2>
-    <label>Theme: 
+    <h2>Settings</h2>
+    <label>Theme:
         <select id="themeSelect">
             <option value="default">Default</option>
             <option value="dark">Dark</option>
             <option value="bright">Bright</option>
             <option value="custom">Custom</option>
         </select>
-    </label>
-    <br>
-    <label>CRT: <input type="checkbox" id="crtToggle" checked></label>
-    <h2>Top 5 Subcategories</h2>
-    <div id="topSubcats"></div>
-    <h2>Top 25 Posts</h2>
-    <div id="topPosts"></div>
-    <h2>Top Users</h2>
-    <div id="topUsers"></div>
-    <button id="closeSettings">Close</button>
+    </label><br>
+    <label>CRT: <input type="checkbox" id="crtToggle" checked></label><br>
+    <button id="changePasswordBtn">Change Password</button><br>
+    <button id="changeProfilePicBtn">Change Profile Pic</button>
 </div>
 
 <script>
-// Profile menu toggle
+// ----- DATA -----
+let users = JSON.parse(localStorage.getItem('users')||"{}");
+let subcategories = JSON.parse(localStorage.getItem('subcategories')||"{}");
+let signedInUser = localStorage.getItem('username');
+
+// ----- PROFILE MENU -----
 const profilePic = document.getElementById('profilePic');
 const popupMenu = document.getElementById('popupMenu');
 profilePic.addEventListener('click', ()=>popupMenu.style.display = popupMenu.style.display==='block'?'none':'block');
 
-// Account / admin system
-let users = JSON.parse(localStorage.getItem('users')||"{}");
-let signedInUser = localStorage.getItem('username');
+// ----- HELPER FUNCTIONS -----
+function isAdminLocal(user, subcat){
+    if(user==="thegreatcheese") return true;
+    if(subcategories[subcat]?.localAdmins?.includes(user)) return true;
+    return false;
+}
+function isAdminGlobal(user){ return users[user]?.globalAdmin || user==="thegreatcheese"; }
+function getAdminTags(user, subcat){
+    let tags = [];
+    if(user==="thegreatcheese") tags.push("[THE CREATOR]");
+    if(isAdminGlobal(user)) tags.push("[adminglobal]");
+    if(isAdminLocal(user, subcat)) tags.push("[adminlocal]");
+    return tags.join(" ");
+}
 
-function isAdmin(name){ return name==="cheesethegreatt"; }
-
+// ----- UPDATE RECENTS -----
 function updateContent(){
     const recentContainer = document.getElementById('recentSubcatsContainer');
     const recommendedBox = document.getElementById('recommendedBox');
@@ -128,78 +145,158 @@ function updateContent(){
             a.textContent=subcat; a.href="#"; a.addEventListener('click',()=>enterSubcategory(subcat));
             recentContainer.appendChild(a);
         });
+        profilePic.textContent = signedInUser.charAt(0).toUpperCase();
     } else {
         recommendedBox.style.display='none';
         recentContainer.innerHTML='&lt;— sign in to see recent subcategories';
+        profilePic.textContent='U';
     }
 }
 updateContent();
 
-// Sign In / Sign Up
+// ----- SIGN IN / SIGN UP -----
 document.getElementById('signInBtn').addEventListener('click', ()=>{
-    let name = prompt("Enter username:"); if(!name) return;
-    let pass = prompt("Enter password:"); if(!pass) return;
-    if(!users[name]) users[name]=pass;
-    else if(users[name]!==pass){ alert("Wrong password!"); return; }
-    signedInUser=name; localStorage.setItem('username',name); localStorage.setItem('users',JSON.stringify(users));
-    alert(`Welcome ${name}!`); updateContent();
+    let name = prompt("Username:"); if(!name) return;
+    let pass = prompt("Password:"); if(!pass) return;
+    if(!users[name]) users[name]= {password:pass, profilePic:null, globalAdmin:false};
+    else if(users[name].password!==pass){ alert("Wrong password!"); return; }
+    signedInUser=name; localStorage.setItem('username',name); localStorage.setItem('users',JSON.stringify(users)); updateContent();
+    alert(`Welcome ${name}!`);
 });
 
-// Change Username
+// ----- CHANGE USERNAME -----
 document.getElementById('changeUserBtn').addEventListener('click', ()=>{
-    if(!signedInUser){ alert("Sign in first!"); return; }
-    let newName=prompt("New username:"); if(!newName) return;
+    if(!signedInUser){ alert("Sign in first"); return; }
+    let newName = prompt("New username:"); if(!newName) return;
     users[newName]=users[signedInUser]; delete users[signedInUser];
-    signedInUser=newName; localStorage.setItem('username',newName); localStorage.setItem('users',JSON.stringify(users)); updateContent();
-    alert(`Username changed to ${newName}`);
+    signedInUser=newName; localStorage.setItem('username',newName); localStorage.setItem('users',JSON.stringify(users));
+    updateContent(); alert(`Username changed to ${newName}`);
 });
 
-// Logout
-document.getElementById('logoutBtn').addEventListener('click', ()=>{ signedInUser=null; localStorage.removeItem('username'); updateContent(); alert("Logged out"); });
+// ----- LOGOUT -----
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    signedInUser=null; localStorage.removeItem('username'); updateContent(); alert("Logged out");
+});
 
-// Add Subcategory
+// ----- ADD SUBCATEGORY -----
 document.getElementById('addSubcatBtn').addEventListener('click', ()=>{
-    if(!signedInUser){ alert("Sign in first!"); return; }
+    if(!signedInUser){ alert("Sign in first"); return; }
     let val=document.getElementById('newSubcat').value.trim(); if(!val) return;
+    if(!subcategories[val]) subcategories[val] = {banner:null,rules:[],flairs:[],requireFlair:false,blockedUsers:[],posts:[],localAdmins:[]};
     let recents = JSON.parse(localStorage.getItem('recentSubcats')||"[]"); recents.push(val);
-    localStorage.setItem('recentSubcats',JSON.stringify(recents)); document.getElementById('newSubcat').value=''; updateContent();
+    localStorage.setItem('recentSubcats',JSON.stringify(recents));
+    localStorage.setItem('subcategories',JSON.stringify(subcategories));
+    document.getElementById('newSubcat').value=''; updateContent();
 });
 
-// Subcategory overlay
-const subcatPage=document.getElementById('subcatPage');
-const subcatTitle=document.getElementById('subcatTitle');
-const subcatContent=document.getElementById('subcatContent');
-document.getElementById('closeSubcat').addEventListener('click',()=>subcatPage.style.display='none');
-function enterSubcategory(name){ subcatTitle.textContent=name; subcatContent.innerHTML=`<p>No posts yet in "${name}".</p>`; subcatPage.style.display='block'; }
+// ----- SUBCATEGORY OVERLAY -----
+const subcatPage = document.getElementById('subcatPage');
+const subcatTitle = document.getElementById('subcatTitle');
+const subcatBanner = document.getElementById('subcatBanner');
+const subcatRules = document.getElementById('subcatRules');
+const subcatContent = document.getElementById('subcatContent');
+let currentSubcat = null;
 
-// Settings / Search overlay
-const settingsOverlay=document.getElementById('settingsOverlay');
-document.getElementById('settingsBtn').addEventListener('click',()=>settingsOverlay.style.display='block');
-document.getElementById('closeSettings').addEventListener('click',()=>settingsOverlay.style.display='none');
+function renderPosts(subcat){
+    subcatContent.innerHTML='';
+    let posts = subcategories[subcat].posts || [];
+    posts.forEach((p,i)=>{
+        let postDiv = document.createElement('div'); postDiv.className='post';
+        postDiv.innerHTML=`<strong>${p.title}</strong> (${p.flair||""}) by ${p.author} ${getAdminTags(p.author,subcat)}<br>${p.content}<br>`;
+        if(p.images) p.images.forEach(imgSrc=>{
+            let img = document.createElement('img'); img.src=imgSrc; img.className='post-image'; postDiv.appendChild(img);
+        });
+        // comments
+        p.comments?.forEach((c,j)=>{
+            let cDiv = document.createElement('div'); cDiv.className='comment';
+            cDiv.innerHTML=`<strong>${c.author} ${getAdminTags(c.author,subcat)}</strong>: ${c.content}`;
+            postDiv.appendChild(cDiv);
+        });
+        // comment input
+        if(signedInUser && !subcategories[subcat].blockedUsers.includes(signedInUser)){
+            let commentInput = document.createElement('input'); commentInput.placeholder="Comment...";
+            let commentBtn = document.createElement('button'); commentBtn.textContent="Post";
+            commentBtn.addEventListener('click', ()=>{
+                let text = commentInput.value.trim(); if(!text) return;
+                // admin commands
+                if(isAdminLocal(signedInUser,subcat) || isAdminGlobal(signedInUser)){
+                    if(text==="$rmvepost"){ posts.splice(i,1); saveAndRender(); return; }
+                    if(text==="$blockuserPOST"){ if(!subcategories[subcat].blockedUsers.includes(p.author)) subcategories[subcat].blockedUsers.push(p.author); saveAndRender(); return; }
+                }
+                posts[i].comments.push({author:signedInUser, content:text});
+                saveAndRender();
+            });
+            postDiv.appendChild(commentInput); postDiv.appendChild(commentBtn);
+        }
+        subcatContent.appendChild(postDiv);
+    });
+}
 
-// Theme toggle & CRT
-document.getElementById('themeSelect').addEventListener('change',e=>{
-    let val=e.target.value;
-    const body=document.body;
+function saveAndRender(){ localStorage.setItem('subcategories',JSON.stringify(subcategories)); renderPosts(currentSubcat); }
+
+function enterSubcategory(name){
+    currentSubcat=name;
+    subcatTitle.textContent=name;
+    subcatBanner.innerHTML=subcategories[name].banner?`<img src="${subcategories[name].banner}" style="max-width:100%">`:'';
+    subcatRules.innerHTML=subcategories[name].rules.join("<br>");
+    subcatPage.style.display='block';
+    renderPosts(name);
+}
+document.getElementById('closeSubcat').addEventListener('click', ()=>subcatPage.style.display='none');
+
+// ----- MAKE POST OVERLAY -----
+const makePostOverlay = document.getElementById('makePostOverlay');
+document.getElementById('makePostBtn').addEventListener('click', ()=>{
+    document.getElementById('postSubcatName').textContent = currentSubcat;
+    makePostOverlay.style.display='block';
+});
+document.getElementById('closeMakePost').addEventListener('click', ()=>makePostOverlay.style.display='none');
+
+document.getElementById('submitPost').addEventListener('click', ()=>{
+    if(!signedInUser){ alert("Sign in"); return; }
+    let title = document.getElementById('postTitle').value.trim();
+    let content = document.getElementById('postContent').value.trim();
+    let flair = document.getElementById('postFlair').value.trim();
+    let tags = document.getElementById('postTags').value.split(" ").filter(t=>t);
+    if(subcategories[currentSubcat].requireFlair && !flair){ alert("Flair required"); return; }
+    let images = [];
+    let files = document.getElementById('postImage').files;
+    for(let f of files){ images.push(URL.createObjectURL(f)); }
+    let postObj = {title, content, flair, tags, images, author:signedInUser, comments:[]};
+    subcategories[currentSubcat].posts.push(postObj);
+    saveAndRender();
+    makePostOverlay.style.display='none';
+});
+
+// ----- SETTINGS OVERLAY -----
+const settingsOverlay = document.getElementById('settingsOverlay');
+document.getElementById('settingsBtn').addEventListener('click', ()=>settingsOverlay.style.display='block');
+document.getElementById('closeSettings').addEventListener('click', ()=>settingsOverlay.style.display='none');
+document.getElementById('themeSelect').addEventListener('change', e=>{
+    let val=e.target.value; const body=document.body;
     if(val==='default'){ body.style.background="#0a0a0a"; body.style.color="#e2e2e2"; }
     if(val==='dark'){ body.style.background="#111"; body.style.color="#eee"; }
     if(val==='bright'){ body.style.background="#fff"; body.style.color="#222"; }
-    if(val==='custom'){ let bg=prompt("Enter bg color (#hex or name)"); let c=prompt("Enter text color"); if(bg) body.style.background=bg; if(c) body.style.color=c; }
+    if(val==='custom'){ let bg=prompt("BG color"); let c=prompt("Text color"); if(bg) body.style.background=bg; if(c) body.style.color=c; }
 });
-document.getElementById('crtToggle').addEventListener('change',e=>document.querySelector('.scanline').style.display=e.target.checked?'block':'none');
+document.getElementById('crtToggle').addEventListener('change', e=>document.querySelector('.scanline').style.display=e.target.checked?'block':'none');
 
-// Top results (mock example)
-function updateTopResults(){
-    let topSubcats=document.getElementById('topSubcats'); let topPosts=document.getElementById('topPosts'); let topUsers=document.getElementById('topUsers');
-    let recents = JSON.parse(localStorage.getItem('recentSubcats')||"[]");
-    topSubcats.innerHTML=''; topPosts.innerHTML=''; topUsers.innerHTML='';
-    recents.slice(0,5).forEach(s=>{ let a=document.createElement('a'); a.textContent=s;a.href="#";topSubcats.appendChild(a);});
-    for(let i=0;i<25;i++){ let p=document.createElement('p'); p.textContent=`Post #${i+1}`; topPosts.appendChild(p);}
-    Object.keys(users).forEach(u=>{ let p=document.createElement('p'); p.textContent=u; if(isAdmin(u)) p.textContent+= " (Admin)"; topUsers.appendChild(p);});
-}
-updateTopResults();
+// ----- CHANGE PASSWORD -----
+document.getElementById('changePasswordBtn').addEventListener('click', ()=>{
+    if(!signedInUser){ alert("Sign in"); return; }
+    let oldPass = prompt("Current password"); if(!oldPass) return;
+    if(users[signedInUser].password!==oldPass){ alert("Wrong password"); return; }
+    let newPass = prompt("New password"); if(!newPass) return;
+    users[signedInUser].password=newPass; localStorage.setItem('users',JSON.stringify(users)); alert("Password changed");
+});
 
+// ----- CHANGE PROFILE PIC -----
+document.getElementById('changeProfilePicBtn').addEventListener('click', ()=>{
+    if(!signedInUser){ alert("Sign in"); return; }
+    let url = prompt("Profile pic URL (or cancel to reset)"); users[signedInUser].profilePic=url||null;
+    localStorage.setItem('users',JSON.stringify(users));
+    profilePic.innerHTML = url?`<img src="${url}" style="width:50px;height:50px;border-radius:50%">`:signedInUser.charAt(0).toUpperCase();
+});
 </script>
 </body>
 </html>
-
