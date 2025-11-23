@@ -1,1 +1,122 @@
-<h1>Hello world!</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Hub</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            font-family: "Courier New", monospace;
+            color: #e2e2e2;
+        }
+
+        /* CRT / retro pixel effect */
+        .scanline {
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(255,255,255,0.03) 0px,
+                rgba(255,255,255,0.03) 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Title */
+        .title {
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 40px;
+            letter-spacing: 10px;
+            font-weight: bold;
+            filter: blur(0.4px);
+            color: #c0c0ff;
+            text-shadow: 0 0 6px #4a4aff;
+        }
+
+        /* Layout container */
+        .layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            height: calc(100vh - 120px);
+        }
+
+        /* Left sidebar */
+        .sidebar {
+            border-right: 2px solid #333;
+            padding: 15px;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        /* Main content */
+        .main {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+        }
+
+        .section {
+            border-bottom: 2px solid #333;
+            padding: 20px;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #9ac0ff;
+        }
+
+        .placeholder-box {
+            width: 100%;
+            height: 100%;
+            border: 2px dashed #444;
+            border-radius: 6px;
+            opacity: 0.7;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="title">blackdev
+    </div>
+
+    <div class="layout">
+        <!-- LEFT SIDEBAR -->
+        <div class="sidebar">
+            <h2>Recents</h2>
+            <p>&lt;— items will go here</p>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main">
+
+            <div class="section">
+                <h2>Popular Categories</h2>
+                <div class="placeholder-box"></div>
+            </div>
+
+            <div class="section">
+                <h2>Recommended</h2>
+                <div class="placeholder-box"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="scanline"></div>
+
+</body>
+</html>
