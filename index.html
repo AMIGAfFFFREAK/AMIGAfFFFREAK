@@ -1,98 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro Hub</title>
-    <style>
-        body {
-            margin: 0;
-            background: #0a0a0a;
-            font-family: "Courier New", monospace;
-            color: #e2e2e2;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retro Hub</title>
+<style>
+    body {
+        margin: 0;
+        background: #0a0a0a;
+        font-family: "Courier New", monospace;
+        color: #e2e2e2;
+    }
+    /* CRT / retro pixel effect */
+    .scanline {
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.03) 0px,
+            rgba(255,255,255,0.03) 1px,
+            transparent 2px
+        );
+        pointer-events: none;
+        z-index: 999;
+    }
+    /* Title */
+    .title {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0;
+        font-size: 40px;
+        letter-spacing: 10px;
+        font-weight: bold;
+        filter: blur(0.4px);
+        color: #c0c0ff;
+        text-shadow: 0 0 6px #4a4aff;
+    }
+    /* Layout container */
+    .layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        height: calc(100vh - 120px);
+    }
+    /* Left sidebar */
+    .sidebar {
+        border-right: 2px solid #333;
+        padding: 15px;
+        overflow-y: auto;
+    }
+    .sidebar h2 {
+        margin-top: 0;
+        font-size: 18px;
+    }
+    .sidebar a {
+        color: #9ac0ff;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 5px;
+        cursor: pointer;
+    }
+    .sidebar input, .sidebar button {
+        margin-top: 5px;
+    }
+    /* Main content */
+    .main {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        padding: 15px;
+    }
+    .section {
+        border-bottom: 2px solid #333;
+        padding: 20px;
+    }
+    .section:last-child {
+        border-bottom: none;
+    }
+    .section h2 {
+        margin-top: 0;
+        font-size: 20px;
+        color: #9ac0ff;
+    }
+    .placeholder-box {
+        width: 100%;
+        height: 100%;
+        border: 2px dashed #444;
+        border-radius: 6px;
+        opacity: 0.7;
+        padding: 5px;
+    }
 
-        /* CRT / retro pixel effect */
-        .scanline {
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(
-                to bottom,
-                rgba(255,255,255,0.03) 0px,
-                rgba(255,255,255,0.03) 1px,
-                transparent 2px
-            );
-            pointer-events: none;
-            z-index: 999;
-        }
+    /* Profile pic & menu */
+    .profile-container {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+    }
+    .profile-pic {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #4a4aff;
+    }
+    .popup-menu {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background: #111;
+        border: 1px solid #444;
+        padding: 10px;
+        border-radius: 6px;
+    }
+    .popup-menu button {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+        color: #eee;
+        background: #222;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+    }
+    .popup-menu button:hover {
+        background: #333;
+    }
 
-        /* Title */
-        .title {
-            width: 100%;
-            text-align: center;
-            padding: 20px 0;
-            font-size: 40px;
-            letter-spacing: 10px;
-            font-weight: bold;
-            filter: blur(0.4px);
-            color: #c0c0ff;
-            text-shadow: 0 0 6px #4a4aff;
-        }
-
-        /* Layout container */
-        .layout {
-            display: grid;
-            grid-template-columns: 240px 1fr;
-            height: calc(100vh - 120px);
-        }
-
-        /* Left sidebar */
-        .sidebar {
-            border-right: 2px solid #333;
-            padding: 15px;
-        }
-
-        .sidebar h2 {
-            margin-top: 0;
-            font-size: 18px;
-        }
-
-        /* Main content */
-        .main {
-            display: grid;
-            grid-template-rows: 1fr 1fr;
-        }
-
-        .section {
-            border-bottom: 2px solid #333;
-            padding: 20px;
-        }
-
-        .section:last-child {
-            border-bottom: none;
-        }
-
-        .section h2 {
-            margin-top: 0;
-            font-size: 20px;
-            color: #9ac0ff;
-        }
-
-        .placeholder-box {
-            width: 100%;
-            height: 100%;
-            border: 2px dashed #444;
-            border-radius: 6px;
-            opacity: 0.7;
-        }
-
-    </style>
+    /* Subcategory page overlay */
+    #subcatPage {
+        display: none;
+        padding: 20px;
+        background:#111;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        color:#eee;
+        z-index: 2000;
+        overflow:auto;
+    }
+    #subcatPage button {
+        background:#222; border:none; padding:5px; color:#eee; cursor:pointer; margin-bottom:10px;
+    }
+    #subcatPage button:hover { background:#333; }
+</style>
 </head>
 <body>
-    <!-- CRT scanlines -->
     <div class="scanline"></div>
-
-    <!-- Title -->
     <div class="title">blackdev</div>
 
     <!-- Profile Pic / Popup Menu -->
@@ -100,95 +156,128 @@
         <img src="profile.png" class="profile-pic" id="profilePic">
         <div class="popup-menu" id="popupMenu">
             <button id="signInBtn">Sign In</button>
+            <button id="changeUserBtn">Change Username</button>
+            <button id="logoutBtn">Log Out</button>
             <button id="settingsBtn">Settings</button>
         </div>
     </div>
 
-    <!-- Layout container -->
+    <!-- Layout -->
     <div class="layout">
-        <!-- LEFT SIDEBAR -->
         <div class="sidebar" id="sidebar">
             <h2>Recents</h2>
-            <div id="recentSubcatsContainer">&lt;— items will go here</div>
+            <div id="recentSubcatsContainer">&lt;— sign in to see recent subcategories</div>
             <input type="text" placeholder="New subcategory" id="newSubcat">
             <button id="addSubcatBtn">Add</button>
         </div>
 
-        <!-- MAIN CONTENT -->
         <div class="main">
             <div class="section">
                 <h2>Popular Categories</h2>
-                <div class="placeholder-box" id="popularBox"></div>
+                <div class="placeholder-box" id="popularBox">Example: Tech, Art, Games</div>
             </div>
             <div class="section">
                 <h2>Recommended</h2>
                 <input type="text" placeholder="Search..." id="searchBar" style="width:100%; padding:5px; margin-bottom:10px;">
-                <div class="placeholder-box" id="recommendedBox"></div>
+                <div class="placeholder-box" id="recommendedBox">Sign in to see recommended content.</div>
             </div>
         </div>
     </div>
 
+    <!-- Subcategory overlay -->
+    <div id="subcatPage">
+        <button id="closeSubcat">← Back</button>
+        <h2 id="subcatTitle"></h2>
+        <div id="subcatContent"></div>
+    </div>
+
     <!-- JS -->
     <script>
-        // Profile popup toggle
         const profilePic = document.getElementById('profilePic');
         const popupMenu = document.getElementById('popupMenu');
         profilePic.addEventListener('click', () => {
             popupMenu.style.display = popupMenu.style.display === 'block' ? 'none' : 'block';
         });
 
-        // Sign-in system
         let signedInUser = localStorage.getItem('username');
         const sidebar = document.getElementById('sidebar');
         const recentContainer = document.getElementById('recentSubcatsContainer');
 
         function updateContent() {
-            if(signedInUser) {
-                // Show recommended box
-                document.getElementById('recommendedBox').style.display = 'block';
-
-                // Load recent subcategories
+            if(signedInUser){
+                document.getElementById('recommendedBox').style.display='block';
                 let recents = JSON.parse(localStorage.getItem('recentSubcats') || "[]");
                 recentContainer.innerHTML = '';
                 recents.forEach(subcat => {
-                    let p = document.createElement('p');
-                    p.textContent = subcat;
-                    recentContainer.appendChild(p);
+                    let a = document.createElement('a');
+                    a.textContent = subcat;
+                    a.href = "#";
+                    a.addEventListener('click', ()=>enterSubcategory(subcat));
+                    recentContainer.appendChild(a);
                 });
             } else {
-                document.getElementById('recommendedBox').style.display = 'none';
+                document.getElementById('recommendedBox').style.display='none';
                 recentContainer.innerHTML = '&lt;— sign in to see recent subcategories';
             }
         }
 
-        updateContent();
-
         document.getElementById('signInBtn').addEventListener('click', () => {
             const username = prompt("Enter your username:");
-            if(username) {
-                signedInUser = username;
+            if(username){
+                signedInUser=username;
                 localStorage.setItem('username', username);
                 alert(`Welcome, ${username}!`);
                 updateContent();
             }
         });
 
-        // Add new subcategory
-        document.getElementById('addSubcatBtn').addEventListener('click', () => {
-            if(!signedInUser) {
-                alert("You must sign in to add subcategories!");
-                return;
+        document.getElementById('changeUserBtn').addEventListener('click', () => {
+            if(!signedInUser) { alert("Sign in first!"); return; }
+            const newName = prompt("Enter new username:");
+            if(newName){
+                signedInUser = newName;
+                localStorage.setItem('username', newName);
+                updateContent();
+                alert(`Username changed to ${newName}`);
             }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', ()=>{
+            signedInUser = null;
+            localStorage.removeItem('username');
+            updateContent();
+            alert("Logged out");
+        });
+
+        document.getElementById('addSubcatBtn').addEventListener('click', ()=>{
+            if(!signedInUser) { alert("Sign in first!"); return; }
             const val = document.getElementById('newSubcat').value.trim();
-            if(val) {
+            if(val){
                 let recents = JSON.parse(localStorage.getItem('recentSubcats') || "[]");
                 recents.push(val);
                 localStorage.setItem('recentSubcats', JSON.stringify(recents));
-                document.getElementById('newSubcat').value = '';
+                document.getElementById('newSubcat').value='';
                 updateContent();
             }
         });
+
+        // Subcategory page
+        const subcatPage = document.getElementById('subcatPage');
+        const subcatTitle = document.getElementById('subcatTitle');
+        const subcatContent = document.getElementById('subcatContent');
+        const closeSubcat = document.getElementById('closeSubcat');
+
+        function enterSubcategory(name){
+            subcatTitle.textContent = name;
+            subcatContent.innerHTML = `<p>No posts yet in "${name}".</p>`;
+            subcatPage.style.display='block';
+        }
+
+        closeSubcat.addEventListener('click', ()=>{
+            subcatPage.style.display='none';
+        });
+
+        updateContent();
     </script>
 </body>
-
 </html>
